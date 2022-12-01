@@ -91,7 +91,6 @@ app.get('/get_chain', function (req, res) {
         soma -= parseInt(block.valor)
     })
     chain.saldo = soma
-    console.log(chain);
     return chain;
   })
   res.send(chain)
