@@ -74,7 +74,7 @@ app.post('/add_block', function(req, res) {
     var cpf = req.body.cpf
     var valor = req.body.valor
     var funcao = req.body.funcao
-    if(add_block(cpf, valor, funcao, "", "")){
+    if(add_block(cpf, valor, funcao)){
       res.sendStatus(200)
     } else {
       res.sendStatus(500)
@@ -96,6 +96,11 @@ app.get('/get_chain', function (req, res) {
   })
   res.send(chain)
 });
+
+app.post('/clean_chain', function (req, res) {
+  chain = []
+  res.sendStatus(200);
+})
   
 app.listen(port, () => {
   console.log(`Exemplo app node rodando no endereço http://localhost:${port}`)
