@@ -71,11 +71,11 @@ async function add_block(cpf, valor, funcao){
   return true
 }
 
-app.post('/add_block', function(req, res) {
+app.post('/add_block', async function(req, res) {
     var cpf = req.body.cpf
     var valor = req.body.valor
     var funcao = req.body.funcao
-    if(add_block(cpf, valor, funcao)){
+    if(await add_block(cpf, valor, funcao)){
       res.sendStatus(200)
     } else {
       res.sendStatus(500)
