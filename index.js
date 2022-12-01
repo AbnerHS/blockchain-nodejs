@@ -98,6 +98,9 @@ app.get('/get_chain', function (req, res) {
 
 app.post('/clean_chain', function (req, res) {
   chain = []
+  last_hash = ''
+  last_proof = 0
+  index = 0
   res.sendStatus(200);
 })
   
