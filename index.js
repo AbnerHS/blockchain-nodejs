@@ -1,11 +1,10 @@
 const express = require('express')
 var cors = require('cors')
-var sha256 = require('js-sha256')
 const crypto = require("crypto")
 const app = express()
 app.use(express.json())
 app.use(cors())
-const port = 8000
+const port = 8080
 
 var chain = []
 var last_hash = ''
