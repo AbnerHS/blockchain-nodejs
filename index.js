@@ -86,9 +86,9 @@ app.get('/get_chain', function (req, res) {
     var soma = 0;
     chain.blocks.forEach((block) => {
       if(block.funcao == 'deposito')
-        soma += parseInt(block.valor)
+        soma += parseFloat(block.valor.replace(",","."))
       if(block.funcao == 'saque')
-        soma -= parseInt(block.valor)
+        soma -= parseFloat(block.valor.replace(",","."))
     })
     chain.saldo = soma
     return chain;
