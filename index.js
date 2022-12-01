@@ -22,6 +22,7 @@ const proof_of_work = async (data) => {
   last_proof = proof
   last_hash = hash
   index++
+  console.log("hash ready")
   return hash
 }
 
