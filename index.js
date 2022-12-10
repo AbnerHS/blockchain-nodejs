@@ -1,33 +1,53 @@
 const express = require('express')
 var cors = require('cors')
 const crypto = require("crypto")
+const { response } = require('express')
 const app = express()
 app.use(express.json())
 app.use(cors())
 const port = 8080
 
 var chain = []
-var last_hash = ''
-var last_proof = 0
 var index = 0
 
 const proof_of_work = async (data) => {
   var hash = ""
   var proof = 1
   while (!is_hash_valid(hash)){
-    var block = `${JSON.stringify(data)}:${last_hash}:${proof}`;
+    var block = `${JSON.stringify(data)}:${hash}:${proof}`;
     var hash = await digestMessage(block)
     proof += 1
   }
-  last_proof = proof
-  last_hash = hash
+  console.log(`hash ${index} ready`)
   index++
-  console.log("hash ready")
-  return hash
+  return {proof, hash}
 }
 
 const is_hash_valid = (hash) => {
   return hash.startsWith("0000");
+}
+
+
+const get_index = () => {
+  let index = 0;
+  chain.forEach(block => {
+    block.blocks.forEach(() => {
+      index++
+    })
+  })
+  return index;
+}
+
+const get_last_hash = () => {
+  let last_hash = ''
+  chain.forEach(block => {
+    block.blocks.forEach(item => {
+      if(index - 1 == item.index){
+        last_hash = item.hash
+      }
+    })
+  })
+  return last_hash
 }
 
 async function digestMessage(message) {
@@ -40,34 +60,40 @@ async function digestMessage(message) {
 
 
 async function add_block(cpf, valor, funcao){
+  let last_hash = get_last_hash();
   var timestamp = new Date().toISOString(); 
   var data = {
     "cpf": cpf, 
     "blocks": [
       {
-        "index": index,
+        "index": get_index(),
         "valor": valor, 
         "funcao": funcao,
         "timestamp": timestamp,
-        "previous_hash": last_hash,
-        "proof": last_proof,
+        "previous_hash": '',
+        "proof": 0,
       }
     ]
   };
+  const response = await proof_of_work(data);
   var cpfIndex = chain.map((chain) => chain.cpf).indexOf(cpf);
   if(cpfIndex == -1){
+    data['blocks'][0]['hash'] = response.hash;
+    data['blocks'][0]['proof'] = response.proof;
+    data['blocks'][0]['previous_hash'] = last_hash
     chain.push(data);
   } else {
     chain[cpfIndex].blocks.push({
-      "index": index,
+      "index": get_index(),
       "valor": valor, 
       "funcao": funcao,
       "timestamp": timestamp,
       "previous_hash": last_hash,
-      "proof": last_proof
+      "proof": response.proof,
+      "hash": response.hash
     });
   }
-  await proof_of_work(data);
+  
   return true
 }
 
