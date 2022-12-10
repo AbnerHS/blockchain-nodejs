@@ -1,7 +1,6 @@
 const express = require('express')
 var cors = require('cors')
 const crypto = require("crypto")
-const { response } = require('express')
 const app = express()
 app.use(express.json())
 app.use(cors())
@@ -14,7 +13,8 @@ const proof_of_work = async (data) => {
   var hash = ""
   var proof = 1
   while (!is_hash_valid(hash)){
-    var block = `${JSON.stringify(data)}:${hash}:${proof}`;
+    data['proof'] = proof
+    var block = JSON.stringify(data);
     var hash = await digestMessage(block)
     proof += 1
   }
@@ -70,12 +70,12 @@ async function add_block(cpf, valor, funcao){
         "valor": valor, 
         "funcao": funcao,
         "timestamp": timestamp,
-        "previous_hash": '',
-        "proof": 0,
+        "previous_hash": last_hash,
+        "proof": ""
       }
     ]
   };
-  const response = await proof_of_work(data);
+  const response = await proof_of_work(data.blocks[0]);
   var cpfIndex = chain.map((chain) => chain.cpf).indexOf(cpf);
   if(cpfIndex == -1){
     data['blocks'][0]['hash'] = response.hash;
@@ -125,8 +125,6 @@ app.get('/get_chain', function (req, res) {
 
 app.post('/clean_chain', function (req, res) {
   chain = []
-  last_hash = ''
-  last_proof = 0
   index = 0
   res.sendStatus(200);
 })
